@@ -1,6 +1,10 @@
 import csv
 import sys
 
+ALL_DATASETS = ['artificial_separable', 'artificial_with_noise', 'adult']
+ARTIFICIAL_DATASETS = ALL_DATASETS[:-1]
+ADULT_DATASET = [ALL_DATASETS[-1]]
+
 
 def get_possible_vals(dataset, continues_dimensions=[]):
     vals = []

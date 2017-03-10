@@ -3,8 +3,10 @@ import common
 import math
 from collections import Counter
 
+NUM_NEIGHBOURS = 5
+
 class KnnClassifier:
-    def __init__(self, n=1, diff_class_penalty = 10):
+    def __init__(self, n=1, diff_class_penalty=10):
         self.data = []
         self.cls = []
         self.conts = []
@@ -59,7 +61,7 @@ class KnnClassifier:
 
 
 if __name__ == '__main__':
-    for dataset_name in ['artificial_separable', 'artificial_with_noise', 'adult']:
+    for dataset_name in common.ALL_DATASETS:
         if 'artificial' in dataset_name:
             X_train, y_train, _ = common.load_artificial_data('data/%s_train.csv' % dataset_name)
             X_test, y_test, _ = common.load_artificial_data('data/%s_test.csv' % dataset_name)
@@ -68,7 +70,7 @@ if __name__ == '__main__':
             X_train, y_train, _, cont_dims = common.load_adult_data('data/%s_train.csv' % dataset_name)
             X_test, y_test, _, _ = common.load_adult_data('data/%s_test.csv' % dataset_name)
 
-        cls = KnnClassifier(3)
+        cls = KnnClassifier(NUM_NEIGHBOURS)
         cls.train(X_train, y_train, continuous_dimensions=cont_dims)
         res = cls.predict(X_test)
         correct = len(list(filter(lambda x: x[0] == x[1], zip(res, y_test))))
