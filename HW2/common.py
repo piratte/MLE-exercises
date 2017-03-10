@@ -45,7 +45,10 @@ def load_adult_data(filename):
                 if idx in cont_dims:
                     d.append(int(val))
                 elif idx == len(datapoint)-1:
-                    classes.append(val)
+                    if val[-1] == '.':
+                        classes.append(val[:-1])
+                    else:
+                        classes.append(val)
                 else:
                     d.append(val)
             data.append(d)
