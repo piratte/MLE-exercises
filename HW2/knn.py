@@ -71,8 +71,10 @@ if __name__ == '__main__':
             SIZE_ADULT_TRAIN, SIZE_ADULT_TEST = 2000, 200
             X_train, y_train, _, cont_dims = common.load_adult_data('data/%s_train.csv' % dataset_name)
             X_test, y_test, _, _ = common.load_adult_data('data/%s_test.csv' % dataset_name)
-            X_train, y_train = X_train[SIZE_ADULT_TRAIN], y_train[SIZE_ADULT_TRAIN]
-            X_test, y_test = X_test[SIZE_ADULT_TEST], y_test[SIZE_ADULT_TEST]
+            X_train, y_train = X_train[:SIZE_ADULT_TRAIN], y_train[:SIZE_ADULT_TRAIN]
+            X_test, y_test = X_test[:SIZE_ADULT_TEST], y_test[:SIZE_ADULT_TEST]
+            print("Using %d training points and %d test points from the adult dataset for performance sake" %
+                  (SIZE_ADULT_TRAIN, SIZE_ADULT_TEST))
 
         cls = KnnClassifier(NUM_NEIGHBOURS)
         cls.train(X_train, y_train, continuous_dimensions=cont_dims)
