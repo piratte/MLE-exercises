@@ -68,7 +68,7 @@ if __name__ == '__main__':
             X_test, y_test, _ = common.load_artificial_data('data/%s_test.csv' % dataset_name)
             cont_dims = []
         else:
-            SIZE_ADULT_TRAIN, SIZE_ADULT_TEST = 2000, 200
+            SIZE_ADULT_TRAIN, SIZE_ADULT_TEST = 3000, 300
             X_train, y_train, _, cont_dims = common.load_adult_data('data/%s_train.csv' % dataset_name)
             X_test, y_test, _, _ = common.load_adult_data('data/%s_test.csv' % dataset_name)
             X_train, y_train = X_train[:SIZE_ADULT_TRAIN], y_train[:SIZE_ADULT_TRAIN]
