@@ -12,7 +12,7 @@ import common
 
 
 if __name__ == '__main__':
-    for dataset_name in common.ALL_DATASETS:
+    for dataset_name in common.ADULT_DATASET:
         dv = DictVectorizer(sparse=False)
         if 'artificial' in dataset_name:
             X_train, y_train, _ = common.load_artificial_data('data/%s_train.csv' % dataset_name)
@@ -24,8 +24,12 @@ if __name__ == '__main__':
             X_train, y_train, _, cont_dims = common.load_adult_data('data/%s_train.csv' % dataset_name)
             X_test, y_test, _, _ = common.load_adult_data('data/%s_test.csv' % dataset_name)
             #enc = OneHotEncoder(categorical_features=[dim for dim in range(0,len(X_train[0])) if dim not in cont_dims], handle_unknown='ignore')
+            cat_dims = [dim for dim in range(0, len(X_train[0])) if dim not in cont_dims]
 
-        X_train, X_test = pd.get_dummies(pd.DataFrame(X_train)).values.tolist(), pd.get_dummies(pd.DataFrame(X_test)).values.tolist()
+        all_data = pd.get_dummies(pd.concat([pd.DataFrame(X_train), pd.DataFrame(X_test)]),  columns=cat_dims, drop_first=True)
+        X_train_new, X_test_new = all_data.iloc[:len(X_train), :].values.tolist(), all_data.iloc[len(X_train):, :].values.tolist()
+        print(len(X_test) == len(X_test_new))
+        print(len(X_train) == len(X_train_new))
         #enc.fit(X_train)
         #pprint(enc.categorical_features)
         #X_train = enc.transform(X_train)
@@ -33,9 +37,9 @@ if __name__ == '__main__':
         #clf = svm.SVC()
 
         clf = nb()
-        clf.fit(X_train, y_train)
+        clf.fit(X_train_new, y_train)
         predictions = []
-        for x in X_test:
-            predictions.append(clf.predict(x))
-        print(list(zip(predictions, y_test)))
-        #print('prediction success %f' % sum(map(lambda x: x[0] == x[1], zip(predictions, y_test)))*100/float(len(y_test)))
+        for x in X_test_new:
+            predictions.append(clf.predict([x])[0])
+        #print(sum([x[0] == x[1] for x in list(zip(predictions, y_test))]))
+        print('prediction success %f' % float(sum([x[0] == x[1] for x in list(zip(predictions, y_test))])*100/float(len(y_test))))
