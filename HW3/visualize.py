@@ -28,14 +28,14 @@ for p in people:
 plt.scatter(avgs, ages, marker='.', label='Measured values')
 
 # do a least squares fit of a cubic polynomial through the data
-p2 = np.poly1d(np.polyfit(avgs, ages, 3))
+p2 = np.poly1d(np.polyfit(avgs, ages, 2))
 
 # plot the resulting curve in the same graph
 avgsSpan = max(avgs) - min(avgs)
 agesSpan = max(ages) - min(ages)
 
 xp = np.linspace(min(avgs)-0.1 * avgsSpan, max(avgs) + 0.1*avgsSpan, 1000)
-plt.plot(xp, p2(xp), '-', c='r', label='Cubic polynomial fit')
+plt.plot(xp, p2(xp), '-', c='r', label='Quadratic polynomial fit')
 
 # set the limits of the figure
 plt.xlim(min(avgs)-0.05 * avgsSpan, max(avgs) + 0.05*avgsSpan)
