@@ -21,7 +21,10 @@ class NaiveBayesClassifier:
 
     @staticmethod
     def calculate_probability_for_continuous(x, mean, stdev):
-        exponent = math.exp(-(math.pow(x-mean, 2)/(2*pow(stdev, 2))))
+        try:
+            exponent = math.exp(-(math.pow(x-mean, 2)/(2*pow(stdev, 2))))
+        except ZeroDivisionError:
+            return 1 if x == mean else 0.000001
         return (1 / (math.sqrt(2*math.pi) * stdev)) * exponent
 
     @staticmethod
