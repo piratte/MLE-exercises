@@ -12,7 +12,7 @@ from naive_bayes import NaiveBayesClassifier
 #ALL_DATASETS = ['aspect', 'digits', 'gdelt', 'glass', 'transport_profitability', 'tumor']
 ALL_DATASETS = ['aspect', 'digits', 'glass', 'transport_profitability', 'tumor']
 #ALL_DATASETS = ['aspect', 'digits',  'glass',  'tumor']
-#ALL_DATASETS = ['transport_profitability']
+#ALL_DATASETS = ['transport_profitability',  'tumor']
 
 TRAIN_PATH_TEMPLATE = '../2017-npfl104/%s/train.txt.gz'
 TEST_PATH_TEMPLATE = '../2017-npfl104/%s/test.txt.gz'
@@ -27,10 +27,8 @@ if __name__ == '__main__':
         if dataset_name == 'transport_profitability':
             train = pd.read_csv(TRAIN_PATH_TEMPLATE % dataset_name, header=None, usecols=[2, 4, 6, 7, 8, 9, 10, 12, 13, 14], compression='gzip')
             train_X, train_y = get_classes(train)
-            print(train_X.iloc[0], train_y.iloc[0])
             test = pd.read_csv(TEST_PATH_TEMPLATE % dataset_name, header=None, usecols=[2, 4, 6, 7, 8, 9, 10, 12, 13, 14], compression='gzip')
             test_X, test_y = get_classes(test)
-            print(test_X.iloc[0], test_y.iloc[0])
         elif dataset_name == 'gdelt':
             train = pd.read_csv(TRAIN_PATH_TEMPLATE % dataset_name, header=None, usecols=range(4, 16),
                                 compression='gzip')
@@ -54,9 +52,11 @@ if __name__ == '__main__':
         #    train_X, test_X = all_data.head(train_X.shape[0]), all_data.tail(all_data.shape[0] - train_X.shape[0])
         if dataset_name == 'transport_profitability':
             cat_dims = [6, 7, 12, 13]
+            cont_dims = [0, 1, 4, 5, 6]
             all_data = pd.get_dummies(pd.concat([pd.DataFrame(train), pd.DataFrame(test)]),  columns=cat_dims)
             train_X, test_X = all_data.head(train_X.shape[0]), all_data.tail(all_data.shape[0] - train_X.shape[0])
         else:
+            cont_dims = list(range(0, orig_train_X.shape[0]))
             cat_dims = []
 
         classifiers = [(DecisionTreeClassifier(), "scikitDecisionTree"),
@@ -70,9 +70,9 @@ if __name__ == '__main__':
                        (svm.SVC(kernel='poly', degree=2), "scikitPolynomialSvm"),
                        (svm.SVC(kernel='linear'), "scikitLinearSvm")]
 
-        classifiers_test = [(DecisionTreeClassifier(), "decision tree")]
+        classifiers_test = [(DecisionTreeClassifier(), "decision tree"), (NaiveBayesClassifier(continuous_dimensions=cont_dims), "myNaiveBayes")]
 
-        for clf, clf_name in classifiers_test:
+        for clf, clf_name in classifiers:
             if clf_name == "myNaiveBayes":
                 clf.fit(orig_train_X.values.tolist(), orig_train_y.values.tolist())
                 predictions = clf.predict(orig_test_X.values.tolist())
