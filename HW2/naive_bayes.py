@@ -6,8 +6,8 @@ class NaiveBayesClassifier:
     SUMMARY_MEAN_IDX = 0
     SUMMARY_STDEV_IDX = 1
 
-    def __init__(self):
-        self.continuous_attributes = []
+    def __init__(self, continuous_dimensions=[]):
+        self.continuous_attributes = continuous_dimensions
         self.class_summaries = {}
 
     @staticmethod
@@ -76,6 +76,9 @@ class NaiveBayesClassifier:
     def train(self, train_data, classes, continuous_dimensions):
         self.continuous_attributes = continuous_dimensions
         self.class_summaries = self.summarize_by_class(train_data, classes)
+
+    def fit(self, train_data, classes):
+        self.train(train_data, classes, self.continuous_attributes)
 
     def predict_one(self, datapoint):
         class_probs = {}
