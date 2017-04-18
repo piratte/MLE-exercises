@@ -12,6 +12,7 @@ from naive_bayes import NaiveBayesClassifier
 #ALL_DATASETS = ['aspect', 'digits', 'gdelt', 'glass', 'transport_profitability', 'tumor']
 ALL_DATASETS = ['aspect', 'digits', 'glass', 'transport_profitability', 'tumor']
 #ALL_DATASETS = ['aspect', 'digits',  'glass',  'tumor']
+#ALL_DATASETS = ['transport_profitability']
 
 TRAIN_PATH_TEMPLATE = '../2017-npfl104/%s/train.txt.gz'
 TEST_PATH_TEMPLATE = '../2017-npfl104/%s/test.txt.gz'
@@ -23,11 +24,19 @@ def get_classes(data):
 if __name__ == '__main__':
     for dataset_name in ALL_DATASETS:
         #print("==========Now learning the %s dataset==========" % dataset_name)
-        if dataset_name == '':
-            train = pd.read_csv(TRAIN_PATH_TEMPLATE % dataset_name, header=[0], usecols=range(2, 15), compression='gzip')
+        if dataset_name == 'transport_profitability':
+            train = pd.read_csv(TRAIN_PATH_TEMPLATE % dataset_name, header=None, usecols=[2, 4, 6, 7, 8, 9, 10, 12, 13, 14], compression='gzip')
+            train_X, train_y = get_classes(train)
+            print(train_X.iloc[0], train_y.iloc[0])
+            test = pd.read_csv(TEST_PATH_TEMPLATE % dataset_name, header=None, usecols=[2, 4, 6, 7, 8, 9, 10, 12, 13, 14], compression='gzip')
+            test_X, test_y = get_classes(test)
+            print(test_X.iloc[0], test_y.iloc[0])
+        elif dataset_name == 'gdelt':
+            train = pd.read_csv(TRAIN_PATH_TEMPLATE % dataset_name, header=None, usecols=range(4, 16),
+                                compression='gzip')
             train_X, train_y = get_classes(train)
 
-            test = pd.read_csv(TEST_PATH_TEMPLATE % dataset_name, header=[0], usecols=range(2, 15), compression='gzip')
+            test = pd.read_csv(TEST_PATH_TEMPLATE % dataset_name, header=None, usecols=range(4, 16), compression='gzip', skipfooter=1)
             test_X, test_y = get_classes(test)
         else:
             train = pd.read_csv(TRAIN_PATH_TEMPLATE % dataset_name, header=None, compression='gzip')
@@ -37,32 +46,33 @@ if __name__ == '__main__':
             test_X, test_y = get_classes(test)
 
         orig_train_X, orig_train_y, orig_test_X, orig_test_y = train_X, train_y, test_X, test_y
-        if dataset_name == 'gdelt':
-            cat_dims = [2, 3]
-            all_data = pd.get_dummies(pd.concat([pd.DataFrame(train), pd.DataFrame(test)]),  columns=cat_dims)
-            train_X, test_X = all_data.head(train_X.shape[0]), all_data.tail(all_data.shape[0] - train_X.shape[0])
-        elif dataset_name == 'transport_profitability':
-            cat_dims = [1, 3, 4, 5, 10, 11]
 
+        #if dataset_name == 'gdelt':
+        #    cat_dims = [2, 3]
+        #    orig_test_X, orig_test_y = orig_test_X[:-1], orig_test_y[:-1]
+        #    all_data = pd.get_dummies(pd.concat([pd.DataFrame(train), pd.DataFrame(test[:-1])]),  columns=cat_dims)
+        #    train_X, test_X = all_data.head(train_X.shape[0]), all_data.tail(all_data.shape[0] - train_X.shape[0])
+        if dataset_name == 'transport_profitability':
+            cat_dims = [6, 7, 12, 13]
             all_data = pd.get_dummies(pd.concat([pd.DataFrame(train), pd.DataFrame(test)]),  columns=cat_dims)
             train_X, test_X = all_data.head(train_X.shape[0]), all_data.tail(all_data.shape[0] - train_X.shape[0])
         else:
             cat_dims = []
 
-        classifiers = [(nb(), "scikitNaiveBayes"),
+        classifiers = [(DecisionTreeClassifier(), "scikitDecisionTree"),
+                       (nb(), "scikitNaiveBayes"),
                        (NaiveBayesClassifier(continuous_dimensions=[dim_ind for dim_ind in range(0, orig_train_X.shape[0])
                                                                     if dim_ind not in cat_dims]), "myNaiveBayes"),
-                       (knn(), "scikit5-NN"),
-                       (DecisionTreeClassifier(), "scikitDecisionTree"),
+                       (knn(n_jobs=-1), "scikit5-NN"),
                        (AdaBoostClassifier(), "scikitADABoost"),
-                       (RandomForestClassifier(), "scikitRandomForest"),
+                       (RandomForestClassifier(n_estimators=100, n_jobs=-1), "scikitRandomForest"),
                        #(svm.SVC(), "rbf svm"),
                        (svm.SVC(kernel='poly', degree=2), "scikitPolynomialSvm"),
                        (svm.SVC(kernel='linear'), "scikitLinearSvm")]
 
-        classifiers_test = [(nb(), "naive bayes"), (DecisionTreeClassifier(), "decision tree")]
+        classifiers_test = [(DecisionTreeClassifier(), "decision tree")]
 
-        for clf, clf_name in classifiers:
+        for clf, clf_name in classifiers_test:
             if clf_name == "myNaiveBayes":
                 clf.fit(orig_train_X.values.tolist(), orig_train_y.values.tolist())
                 predictions = clf.predict(orig_test_X.values.tolist())
