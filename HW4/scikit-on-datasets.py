@@ -22,7 +22,7 @@ def get_classes(data):
 
 if __name__ == '__main__':
     for dataset_name in ALL_DATASETS:
-        print("==========Now learning the %s dataset==========" % dataset_name)
+        #print("==========Now learning the %s dataset==========" % dataset_name)
         if dataset_name == '':
             train = pd.read_csv(TRAIN_PATH_TEMPLATE % dataset_name, header=[0], usecols=range(2, 15), compression='gzip')
             train_X, train_y = get_classes(train)
@@ -50,7 +50,7 @@ if __name__ == '__main__':
             cat_dims = []
 
         classifiers = [(nb(), "scikitNaiveBayes"),
-                       (NaiveBayesClassifier(continuous_dimensions=[dim_ind for dim_ind in range(0, train_X.shape[0])
+                       (NaiveBayesClassifier(continuous_dimensions=[dim_ind for dim_ind in range(0, orig_train_X.shape[0])
                                                                     if dim_ind not in cat_dims]), "myNaiveBayes"),
                        (knn(), "scikit5-NN"),
                        (DecisionTreeClassifier(), "scikitDecisionTree"),
@@ -71,6 +71,6 @@ if __name__ == '__main__':
                 predictions = clf.predict(test_X)
             #print('prediction success of the %s: %0.2f%%' %
             #     (clf_name, float(sum([x[0] == x[1] for x in list(zip(predictions, test_y))])*100/float(len(test_y)))))
-
-            print('%s\t%s\t%0.2f%%\tadammar\tORIGFEATS' %
-                  (dataset_name, clf_name, float(sum([x[0] == x[1] for x in list(zip(predictions, test_y))])*100/float(len(test_y)))))
+            comment = 'ORIGFEATS' if dataset_name not in ['gdelt', 'transport_profitability'] else 'ONEHOT'
+            print('%s\t%s\t%0.2f%%\tadammar\t%s' %
+                  (dataset_name, clf_name, float(sum([x[0] == x[1] for x in list(zip(predictions, test_y))])*100/float(len(test_y))), comment))
