@@ -1,5 +1,5 @@
 run:
-    python scikit-reg-tests.py
+	python scikit-reg-tests.py
 
 all: run
 

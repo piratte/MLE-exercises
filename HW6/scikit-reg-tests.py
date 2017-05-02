@@ -4,6 +4,7 @@ import pandas as pd
 from sklearn.neighbors import KNeighborsRegressor as knn
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.ensemble import AdaBoostRegressor
+from sklearn.linear_model import LinearRegression
 
 from scipy.spatial.distance import sqeuclidean
 
@@ -31,7 +32,7 @@ if __name__ == '__main__':
                                                                                          flats_train_count:,
                                                                                          :].values.tolist()
 
-    classifiers = [(knn(), "knn"), (DecisionTreeRegressor(), "dt"), (AdaBoostRegressor(), "ada")]
+    classifiers = [(knn(), "knn"), (DecisionTreeRegressor(), "dt"), (AdaBoostRegressor(), "ada"), (LinearRegression(n_jobs=-1), "linreg")]
 
     for clsMet, clsName in classifiers:
         preds = clsMet.fit(artif_train_X, artif_train_y).predict(artif_test_X)

@@ -20,7 +20,7 @@ class LinearModel:
 
     def predict_one(self, test_x):
         #if self.debug: print(test_x, self.coef)
-        #print(test_x, self.coef)
+        #print(test_x, self.coef, self.learning_rate)
         #print(np.dot(self.coef, np.insert(test_x, [0], [1])))
         return np.dot(self.coef, np.insert(test_x, [0], [1]))
 
@@ -37,13 +37,13 @@ class LinearModel:
             sum_error = 0.0
             for datapoint, target in zip(train_x, train_y):
                 # print(dim)
-                print(self.predict_one(datapoint), target)
+                # print(self.predict_one(datapoint), target)
                 error = self.predict_one(datapoint) - target
                 self.coef[0] -= self.learning_rate * error
                 for i in range(dim):
                     self.coef[i+1] -= self.learning_rate * error * datapoint[i]
                 sum_error += np.float_power(error, 2)
-            if sum_error < 0.0001:
+            if sum_error < 1:
                 break
 
 if __name__ == '__main__':
@@ -67,9 +67,16 @@ if __name__ == '__main__':
 
     print(len(flats_train_X[0]), len(flats_test_X[0]))
 
-    cls = LinearModel(0.001, 1000)
+    cls = LinearModel(0.0001, 1000)
     cls.fit(artif_train_X, artif_train_y)
     preds = cls.predict(artif_test_X)
-    print(preds)
+    # print(preds)
     score = list(map(lambda x: sqeuclidean(x[0], x[1]), zip(preds, artif_test_y)))
+    print("Score for %s on artif is %f" % ("mine", np.mean(np.array(score))))
+
+    cls = LinearModel(0.0001, 1000)
+    cls.fit(flats_train_X, flats_train_y)
+    preds = cls.predict(flats_test_X)
+    # print(preds)
+    score = list(map(lambda x: sqeuclidean(x[0], x[1]), zip(preds, flats_test_y)))
     print("Score for %s on artif is %f" % ("mine", np.mean(np.array(score))))
